@@ -1,0 +1,25 @@
+<f:view
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui" xmlns:portlet="http://java.sun.com/portlet_2_0">
+    <h:head>
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:panel header="Insert Your information">
+                <h:panelGrid columns="2" columnClasses="column" cellpadding="5">
+                    <h:outputText value="From: " />
+                    <p:inputText value="#{mailController.from}"/>
+                    <h:outputText value="to: " />
+                    <p:inputText value="#{mailController.to}"/>
+                    <h:outputText value="subject: " />
+                    <p:inputText value="#{mailController.subject}"/>
+                    <h:outputText value="text: " />
+                    <p:inputText value="#{mailController.content}"/>
+                    <h:commandButton value ="send" actionListener="#{mailController.send}"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+    </h:body>
+</f:view>

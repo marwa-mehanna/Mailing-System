@@ -1,0 +1,70 @@
+<f:view
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:head>
+    </h:head>
+    <h:body>
+        <h:form id="form">
+            <div class="panel panel-default">
+                <div class="panel-heading">Select the context for this mail summary</div>
+                <div class="panel-body">
+                    <h:outputText rendered="#{mailController.poiPerson}" value="Owner (person): " />
+                    <h:outputText rendered="#{not empty mailController.poi}" value="#{mailController.poi.name}" />
+                    <h:outputText rendered="#{empty mailController.poi}" value="Nothing selected." />
+
+                    <div class="pull-right">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                Set person <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <ui:repeat value="#{mailController.allPersons}" var="person">
+                                    <li>
+                                        <h:commandLink actionListener="#{mailController.setNewPoi(person.idCol)}">#{person.name}</h:commandLink>
+                                    </li>
+                                </ui:repeat>
+                            </ul>
+                        </div>
+
+                        <div class="btn-group">
+                            <h:commandButton actionListener="#{mailController.setNewPoi(null)}" value="Clear" styleClass="btn btn-default" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h:panelGroup layout="block" id="imaps" rendered="#{not empty mailController.poi}" styleClass="panel panel-default">
+                <div class="panel-heading">Configure #{mailControllerController.poi.name}'s iMap sources
+                    <div class="pull-right">
+
+                        <p:commandLink oncomplete="addIMapDialog.show()"><span class="glyphicon glyphicon-plus-sign"></span></p:commandLink>
+                    </div>
+                </div>
+
+
+            </h:panelGroup>
+
+            <p:dialog header="Add IMap source" id="addIMapDialog" widgetVar="addIMapDialog" modal="true">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-font"></span>
+                    <p:inputText id="username" value="#{mailController.username}" styleClass="form-control" />
+                    <p:watermark value="IMap user name" for="username" />
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-globe"></span>
+                    <p:inputText id="password" value="#{mailController.password}" styleClass="form-control" />
+                    <p:watermark value="IMap password" for="password" />
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-user"></span>
+                    <p:inputText id="host" value="#{mailController.host}" styleClass="form-control" />
+                    <p:watermark value="IMap host" for="host" />
+                </div>
+                <p:commandButton value="Add IMap source" update=":form:imaps,:form:addIMapDialog" action="#{mailController.addAccount}" />
+            </p:dialog>
+        </h:form>
+
+    </h:body>
+</f:view>
