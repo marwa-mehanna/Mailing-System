@@ -1,20 +1,18 @@
 package de.eonas.website.activities;
 
-import javax.mail.Message;
-import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
+
 
 public class SendMail {
     private String from;
     private String to;
     private String subject;
     private String text;
-    Transport transport;
+    //Transport transport;
+
 
     public SendMail(String from, String to, String subject, String text) {
         this.from = from;
@@ -23,76 +21,59 @@ public class SendMail {
         this.text = text;
     }
 
-    /*public void Send(){
+
+    public void send() throws MessagingException {
+        String host = "smtp.gmail.com";
+        final String username = "mailtrials.marwa@gmail.com";
+        final String password = "123456marwa";
         Properties props = new Properties();
+        // set any needed mail.smtps.* properties here
         props.put("mail.transport.protocol", "smtp");
-       // props.put("mail.smtp.host", "localhost");
-        //props.put("mail.smtp.auth", "false");// set to false for no username
-        //props.put("mail.debug", "false");
-        //props.put("mail.smtp.port", "25");
-       props.put("mail.smtp.host", "smtp.gmail.com");
+       // props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.user", username);
+        props.put("mail.smtp.auth","true");
         props.put("mail.smtp.port", "465");
-        Session mailSession = Session.getInstance(props);
-        Message simpleMessage = new MimeMessage(mailSession);
+        props.put("mail.debug", "true");
+        props.put("mail.smtp.debug", "true");
+        props.put("mail.smtp.ssl.enable","true");
+       // props.put("mail.smtp.starttls.enable","true");
+
+
+        //props.put("mail.mime.charset", "ISO-8859-1");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.fallback", "false");
+        props.put("mail.smtp.socketFactory.class",
+                "javax.net.ssl.SSLSocketFactory");
+
+        Authenticator auth = new GMailAuthenticator();
+        Session session = Session.getInstance(props,auth);
+
+        session.setDebug(true);
+
+        MimeMessage msg = new MimeMessage(session);
+
+        // set the message content here
         InternetAddress fromAddress = null;
         InternetAddress toAddress = null;
-        try {
         fromAddress = new InternetAddress(from);
         toAddress = new InternetAddress(to);
-         } catch (AddressException e) {
-
-         e.printStackTrace();
-         }
-
-         try {
-         simpleMessage.setFrom(fromAddress);
-         simpleMessage.setRecipient(RecipientType.TO, toAddress);
-         simpleMessage.setSubject(subject);
-         simpleMessage.setText(text);
-         transport.send(simpleMessage);
-             System.out.println("MARWA");
-
-             System.out.println("MARWA");
-
-         } catch (MessagingException e) {
-
-           e.printStackTrace();
-             //try {
-               //  transport.close();
-             //} catch (MessagingException e1) {
-               //  e1.printStackTrace();
-             //}
-         }
-    }*/
-    public void send() throws MessagingException {
-
-        Properties props = new Properties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.host", "smtp.gmail.comt");
-        props.put("mail.smtp.auth", "false");// set to false for no username
-        props.put("mail.debug", "false");
-        props.put("mail.smtp.port", "465");
-
-        Session session = Session.getDefaultInstance(props);
-
-        InternetAddress fromAddress = null;
-        InternetAddress toAddress = null;
-        Transport transport = session.getTransport("smtp");
-        transport.connect();
+        msg.setFrom(fromAddress);
+        msg.setRecipient(Message.RecipientType.TO, toAddress);
+        msg.setSubject(subject);
+        msg.setText(text);
         try {
-            Message simpleMessage = new MimeMessage(session);
-            fromAddress = new InternetAddress(from);
-            toAddress = new InternetAddress(to);
-            simpleMessage.setFrom(fromAddress);
-            simpleMessage.setRecipient(RecipientType.TO, toAddress);
-            simpleMessage.setSubject(subject);
-            simpleMessage.setText(text);
-            transport.sendMessage(simpleMessage,
-                    simpleMessage.getAllRecipients());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        } finally {
-            transport.close();
+            Transport.send(msg);
+        }  finally {
+
+        }
+    }
+    private class GMailAuthenticator extends javax.mail.Authenticator {
+        public PasswordAuthentication getPasswordAuthentication() {
+            String user = "mailtrials.marwa@gmail.com";
+            String pwd = "123456marwa";
+
+            return new PasswordAuthentication(user, pwd);
         }
     }
 }

@@ -1,9 +1,8 @@
 package de.eonas.website.activities;
 
-import de.eonas.website.activities.model.Mail;
+import de.eonas.website.activities.model.Mailer;
 import de.eonas.website.activities.model.Person;
 import de.eonas.website.activities.model.Poi;
-import de.eonas.website.activities.model.Mailer;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -29,16 +28,25 @@ public class MailController extends AbstractController{
 
 
 
+
     private List<Person> allPersons;
 
 
+    public List<Mailer> getAllAccounts() {
+        return allAccounts;
+    }
 
-    private List<Mail>allMails;
+    public void setAllAccounts(List<Mailer> allAccounts) {
+        this.allAccounts = allAccounts;
+    }
+
+    private List<Mailer>allAccounts;
 
 
    public MailController() throws IOException{
        init();
        allPersons = dao.getAllPersons();
+       updateIMapList();
 
    }
     public void addAccount(){
@@ -48,6 +56,8 @@ public class MailController extends AbstractController{
         account.setUsername(username);
         account.setPassword(password);
         account.setHost(host);
+        account.setPoi(poi);
+        dao.getAccountsByPoi(poi).add(account);
         dao.saveAccount(account);
         dao.savePoi(poi);
         username="";
@@ -55,6 +65,13 @@ public class MailController extends AbstractController{
         host="";
 
     }
+    private void updateIMapList() {
+
+        Poi poi = getPoi();
+        allAccounts = dao.getAccountsByPoi(poi);
+    }
+
+
     public void setNewPoi(long id) {
         System.out.print(id);
         Poi poi = dao.getPoiById(id);
@@ -143,13 +160,7 @@ public class MailController extends AbstractController{
     public void setContent(String content) {
         this.content = content;
     }
-    public List<Mail> getAllMails() {
-        return allMails;
-    }
 
-    public void setAllMails(List<Mail> allMails) {
-        this.allMails = allMails;
-    }
 
 
 }

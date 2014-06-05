@@ -23,6 +23,7 @@
                                 <ui:repeat value="#{mailController.allPersons}" var="person">
                                     <li>
                                         <h:commandLink actionListener="#{mailController.setNewPoi(person.idCol)}">#{person.name}</h:commandLink>
+
                                     </li>
                                 </ui:repeat>
                             </ul>
@@ -34,7 +35,6 @@
                     </div>
                 </div>
             </div>
-
             <h:panelGroup layout="block" id="imaps" rendered="#{not empty mailController.poi}" styleClass="panel panel-default">
                 <div class="panel-heading">Configure #{mailControllerController.poi.name}'s iMap sources
                     <div class="pull-right">
@@ -42,6 +42,14 @@
                         <p:commandLink oncomplete="addIMapDialog.show()"><span class="glyphicon glyphicon-plus-sign"></span></p:commandLink>
                     </div>
                 </div>
+                <ul class="list-group">
+                    <ui:repeat value="#{mailController.allAccounts}" var="account">
+                        <li class="list-group-item">
+                            <h:outputFormat value="Account: " rendered="#{not empty account.username or not empty account.password}" />
+                            <h:outputLabel value="#{account.username}">#{"@"}#{account.host}</h:outputLabel>
+                        </li>
+                    </ui:repeat>
+                </ul>
 
 
             </h:panelGroup>

@@ -1,26 +1,28 @@
 package de.eonas.website.activities;
+
 import de.eonas.website.activities.model.Mail;
 import de.eonas.website.activities.model.Mailer;
 
 import javax.mail.*;
+import java.util.List;
 import java.util.Properties;
 
 public class ReceiveMail {
 
-    public static Mail receiveEmail() {
+    public static Mail receiveEmail(List<Mailer> accounts) {
         Properties props = new Properties();
         props.setProperty("mail.store.protocol", "imaps");
         try {
             Mail mail = new Mail();
-            Mailer account=new Mailer();
-            String accountconc=account.getUsername()+"@"+account.getHost();
-            String accountpassword=account.getPassword();
+            String accountconc=accounts.get(0).getUsername()+"@"+accounts.get(0).getHost();
+            String accountpassword=accounts.get(0).getPassword();
             Session session = Session.getInstance(props, null);
             Store store = session.getStore();
             store.connect("imap.gmail.com", accountconc,accountpassword);
             System.out.println("Established Connection to Server!");
             Folder inbox = store.getFolder("Inbox");
             inbox.open(Folder.READ_ONLY);
+            System.out.println(inbox.getMessageCount());
             Message msg = inbox.getMessage(inbox.getMessageCount());
             System.out.println("Found specified Folder, retrieving the latest message...");
             Address[] in = msg.getFrom();
@@ -30,17 +32,37 @@ public class ReceiveMail {
                 //System.out.println("FROM:" + address.toString());
                 mail.setMailFrom(address.toString());
             }
-            Multipart mp = (Multipart) msg.getContent();
-            BodyPart bp = mp.getBodyPart(0);
+            Object content = msg.getContent();
+            if (content instanceof String)
+            {
+                String body = (String)content;
+                mail.setMailContent(body);
+                mail.setMailSubject(msg.getSubject());
+                mail.setMailFrom(msg.getFrom().toString());
+                return mail;
 
+            }
+            else if (content instanceof Multipart)
+            {
+                Multipart mp = (Multipart)content;
+                BodyPart bp = mp.getBodyPart(0);
                 mail.setMailContent(bp.getContent().toString());
                 mail.setMailContentType(bp.getContentType().toString());
                 mail.setMailSubject(msg.getSubject());
+                System.out.println("CONTENT:" + bp.getContent());
+                return mail;
+            }
+            //Multipart mp = (Multipart) msg.getContent();
+            //BodyPart bp = mp.getBodyPart(0);
 
-            System.out.println("SENT DATE:" + msg.getSentDate());
-            System.out.println("SUBJECT:" + msg.getSubject());
-            System.out.println("CONTENT:" + bp.getContent());
-            return mail;
+                //mail.setMailContent(bp.getContent().toString());
+                //mail.setMailContentType(bp.getContentType().toString());
+                //mail.setMailSubject(msg.getSubject());
+
+            //System.out.println("SENT DATE:" + msg.getSentDate());
+            //System.out.println("SUBJECT:" + msg.getSubject());
+           // System.out.println("CONTENT:" + bp.getContent());
+
         } catch (Exception mex) {
             mex.printStackTrace();
         }

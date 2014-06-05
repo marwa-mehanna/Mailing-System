@@ -15,16 +15,19 @@ public class Mailer {
     private String password;
     private String host;
 
+    public Poi getPoi() {
+        return poi;
+    }
+
+    public void setPoi(Poi poi) {
+        this.poi = poi;
+    }
+
     @ManyToOne
-    private Person person;
+    private Poi poi;
 
-    public Person getPerson() {
-        return person;
-    }
 
-    public void setPerson(Person person) {
-        this.person = person;
-    }
+
 
 
 

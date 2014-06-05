@@ -103,9 +103,16 @@ public class Dao {
         }
         */
     }
+    public List<Mailer>getAllAccounts(){
+        TypedQuery<Mailer> query = em.createQuery("select a from Mailer a", Mailer.class);
+        return query.getResultList();
+    }
 
     public Feed saveFeed(Feed feed) {
         return em.merge(feed);
+    }
+    public Mail saveMail(Mail mail) {
+        return em.merge(mail);
     }
 
     public void saveFeedEntry(FeedEntry feedEntry) {
@@ -226,6 +233,15 @@ public class Dao {
             return null;
         }
 
+    }
+    public List<Mailer> getAccountsByPoi(Poi poi){
+        TypedQuery<Mailer> query=em.createQuery("select a from Mailer a where poi= :poi",Mailer.class);
+        query.setParameter("poi",poi);
+        try{
+            return query.getResultList();
+        }catch (NoResultException e){
+            return null;
+        }
     }
 
     public void removeICal(ICal ical) {
