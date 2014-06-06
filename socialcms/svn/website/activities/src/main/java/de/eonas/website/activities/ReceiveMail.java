@@ -4,6 +4,7 @@ import de.eonas.website.activities.model.Mail;
 import de.eonas.website.activities.model.Mailer;
 
 import javax.mail.*;
+import javax.mail.search.FlagTerm;
 import java.util.List;
 import java.util.Properties;
 
@@ -13,7 +14,10 @@ public class ReceiveMail {
         Properties props = new Properties();
         props.setProperty("mail.store.protocol", "imaps");
         try {
-            Mail mail = new Mail();
+            Flags seen = new Flags(Flags.Flag.SEEN);
+            FlagTerm unseenFlagTerm = new FlagTerm(seen,false);
+
+
             String accountconc=accounts.get(0).getUsername()+"@"+accounts.get(0).getHost();
             String accountpassword=accounts.get(0).getPassword();
             Session session = Session.getInstance(props, null);
@@ -23,47 +27,55 @@ public class ReceiveMail {
             Folder inbox = store.getFolder("Inbox");
             inbox.open(Folder.READ_ONLY);
             System.out.println(inbox.getMessageCount());
-            Message msg = inbox.getMessage(inbox.getMessageCount());
-            System.out.println("Found specified Folder, retrieving the latest message...");
-            Address[] in = msg.getFrom();
+            //Message msg = inbox.getMessage(inbox.getMessageCount());
+            Message message[] = inbox.getMessages();
+            for (int i = 3; i < message.length; i++) {
+                Message msg = message[i];
+                //Flags flags = msg.getFlags();
 
-            for (Address address : in) {
+                System.out.println("Found specified Folder, retrieving the latest message...");
 
-                //System.out.println("FROM:" + address.toString());
-                mail.setMailFrom(address.toString());
-            }
-            Object content = msg.getContent();
-            if (content instanceof String)
-            {
-                String body = (String)content;
-                mail.setMailContent(body);
-                mail.setMailSubject(msg.getSubject());
-                mail.setMailFrom(msg.getFrom().toString());
-                return mail;
 
-            }
-            else if (content instanceof Multipart)
-            {
-                Multipart mp = (Multipart)content;
-                BodyPart bp = mp.getBodyPart(0);
-                mail.setMailContent(bp.getContent().toString());
-                mail.setMailContentType(bp.getContentType().toString());
-                mail.setMailSubject(msg.getSubject());
-                System.out.println("CONTENT:" + bp.getContent());
-                return mail;
-            }
-            //Multipart mp = (Multipart) msg.getContent();
-            //BodyPart bp = mp.getBodyPart(0);
+                Mail mail = new Mail();
+                Address[] in = msg.getFrom();
+
+                for (Address address : in) {
+
+                    //System.out.println("FROM:" + address.toString());
+                    mail.setMailFrom(address.toString());
+                }
+                Object content = msg.getContent();
+                if (content instanceof String)
+                {
+                    String body = (String)content;
+                    mail.setMailContent(body);
+                    mail.setMailSubject(msg.getSubject());
+                    mail.setMailFrom(msg.getFrom().toString());
+                    return mail;
+
+                }
+                else if (content instanceof Multipart)
+                {
+                    Multipart mp = (Multipart)content;
+                    BodyPart bp = mp.getBodyPart(0);
+                    mail.setMailContent(bp.getContent().toString());
+                    mail.setMailContentType(bp.getContentType().toString());
+                    mail.setMailSubject(msg.getSubject());
+                    System.out.println("CONTENT:" + bp.getContent());
+                    return mail;
+                }
+                //Multipart mp = (Multipart) msg.getContent();
+                //BodyPart bp = mp.getBodyPart(0);
 
                 //mail.setMailContent(bp.getContent().toString());
                 //mail.setMailContentType(bp.getContentType().toString());
                 //mail.setMailSubject(msg.getSubject());
 
-            //System.out.println("SENT DATE:" + msg.getSentDate());
-            //System.out.println("SUBJECT:" + msg.getSubject());
-           // System.out.println("CONTENT:" + bp.getContent());
+                //System.out.println("SENT DATE:" + msg.getSentDate());
+                //System.out.println("SUBJECT:" + msg.getSubject());
+                // System.out.println("CONTENT:" + bp.getContent());
 
-        } catch (Exception mex) {
+            }} catch (Exception mex) {
             mex.printStackTrace();
         }
         return null;
@@ -108,16 +120,4 @@ public class ReceiveMail {
         catch (messagingexception e) {e.printstacktrace();}
         catch (ioexception e) {e.printstacktrace();}*/
 
-    }
-
-    //public static void main(String[] args) {
-
-        //String host = "smtp.gmail.com";//change accordingly
-        //String mailStoreType = "pop3";
-        //final String username= "marwa.mehana@gmail.com";
-        //final String password= "";//change accordingly
-
-        //receiveEmail(host, mailStoreType, username, password);
-
-    //}
-
+}
