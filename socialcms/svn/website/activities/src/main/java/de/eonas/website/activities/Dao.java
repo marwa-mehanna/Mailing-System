@@ -92,16 +92,6 @@ public class Dao {
         } catch ( NoResultException ex ) {
             return new ArrayList<FeedEntry>();
         }
-        /*
-        TypedQuery<FeedEntry> query = em.createQuery("select a from FeedEntry a where feed = :feed", FeedEntry.class);
-        query.setParameter("feed", feed);
-
-        try {
-            return query.getResultList();
-        } catch (NoResultException e) {
-            return null;
-        }
-        */
     }
     public List<Mailer>getAllAccounts(){
         TypedQuery<Mailer> query = em.createQuery("select a from Mailer a", Mailer.class);
@@ -113,6 +103,23 @@ public class Dao {
     }
     public Mail saveMail(Mail mail) {
         return em.merge(mail);
+
+    }
+    public boolean checkMailUnExistence(int MessageNumber,Date recDate,String host){
+        TypedQuery<Mail> query = em.createQuery("select a from Mail a where a.messageNumber = :MessageNumber and a.rectDate = :recDate and a.host =:host", Mail.class);
+        query.setParameter("MessageNumber", MessageNumber);
+        query.setParameter("recDate", recDate);
+        query.setParameter("host", host);
+
+
+
+            if( query.getResultList().size()==0){
+                return true;
+            }
+            else {
+                return false;
+            }
+
     }
 
     public void saveFeedEntry(FeedEntry feedEntry) {
@@ -149,9 +156,13 @@ public class Dao {
 
         return portletSettings;
     }
-
     public List<Person> getAllPersons() {
-        TypedQuery<Person> query = em.createQuery("select a from Person a order by name", Person.class);
+        TypedQuery<Person> query = em.createQuery("select a from Person a order by name ", Person.class);
+        return query.getResultList();
+    }
+
+    public List<Mail> getAllMails() {
+        TypedQuery<Mail> query = em.createQuery("select a from Mail a order by current_date ", Mail.class);
         return query.getResultList();
     }
 
@@ -239,6 +250,20 @@ public class Dao {
         query.setParameter("poi",poi);
         try{
             return query.getResultList();
+        }catch (NoResultException e){
+            return null;
+        }
+    }
+    public Mail getSelectedMail(int ms){
+        TypedQuery<Mail> query=em.createQuery("select a from Mail a where a.messageNumber = :ms ",Mail.class);
+        query.setParameter("ms",ms);
+        return query.getSingleResult();
+    }
+    public Mailer getAccountDetails(String account){
+        TypedQuery<Mailer> query=em.createQuery("select a from Mailer a where a.username = :account",Mailer.class);
+        query.setParameter("account",account);
+        try{
+            return query.getSingleResult();
         }catch (NoResultException e){
             return null;
         }

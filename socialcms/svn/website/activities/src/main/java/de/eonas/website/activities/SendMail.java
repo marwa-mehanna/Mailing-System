@@ -11,26 +11,32 @@ public class SendMail {
     private String to;
     private String subject;
     private String text;
+    private String username;
+    private String password;
+    private String host;
     //Transport transport;
 
 
-    public SendMail(String from, String to, String subject, String text) {
+    public SendMail(String from, String to, String subject, String text,String username,String password,String host) {
         this.from = from;
         this.to = to;
         this.subject = subject;
         this.text = text;
+        this.username=username;
+        this.password=password;
+        this.host =host;
     }
 
 
     public void send() throws MessagingException {
-        String host = "smtp.gmail.com";
-        final String username = "mailtrials.marwa@gmail.com";
-        final String password = "123456marwa";
+      String hostsmtp="smtp."+host;
+         //String username = username;
+        //final String password = "123456marwa";
         Properties props = new Properties();
         // set any needed mail.smtps.* properties here
         props.put("mail.transport.protocol", "smtp");
        // props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.host", hostsmtp);
         props.put("mail.smtp.user", username);
         props.put("mail.smtp.auth","true");
         props.put("mail.smtp.port", "465");
@@ -70,8 +76,8 @@ public class SendMail {
     }
     private class GMailAuthenticator extends javax.mail.Authenticator {
         public PasswordAuthentication getPasswordAuthentication() {
-            String user = "mailtrials.marwa@gmail.com";
-            String pwd = "123456marwa";
+            String user = username;
+            String pwd = password;
 
             return new PasswordAuthentication(user, pwd);
         }

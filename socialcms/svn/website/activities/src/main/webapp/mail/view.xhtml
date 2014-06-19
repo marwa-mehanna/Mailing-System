@@ -1,5 +1,4 @@
-<f:view
-        xmlns:h="http://java.sun.com/jsf/html"
+<f:view xmlns:h="http://java.sun.com/jsf/html"
         xmlns:f="http://java.sun.com/jsf/core"
         xmlns:ui="http://java.sun.com/jsf/facelets"
         xmlns:p="http://primefaces.org/ui" xmlns:portlet="http://java.sun.com/portlet_2_0">
@@ -20,6 +19,26 @@
                     <h:commandButton value ="send" actionListener="#{mailController.send}"/>
                 </h:panelGrid>
             </p:panel>
+
+            <p:layout style="min-width:400px;min-height:200px;">
+               <p:layoutUnit position="center">
+                    <p:dataTable var="mail" value="#{mailController.allMails}">
+                        <p:column headerText="From">
+                            <h:outputText value="#{mail.mailFrom}" />
+                        </p:column>
+
+                        <p:column headerText="Subject">
+                            <h:outputText value="#{mail.mailSubject}" />
+                        </p:column>
+                        <p:column headerText="view">
+                            <p:commandLink  actionListener="#{mailController.getMailFromSubject(mail.messageNumber)}" oncomplete="Message.show()"><span class="glyphicon glyphicon-resize-horizontal"></span></p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                </p:layoutUnit>
+            </p:layout>
+            <p:dialog header="Mail" id="Message" widgetVar="Message" modal="true">
+                <h:outputText value="#{mailController.mailSelected}" />
+            </p:dialog>
         </h:form>
     </h:body>
 </f:view>

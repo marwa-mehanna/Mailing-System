@@ -46,7 +46,7 @@
                     <ui:repeat value="#{mailController.allAccounts}" var="account">
                         <li class="list-group-item">
                             <h:outputFormat value="Account: " rendered="#{not empty account.username or not empty account.password}" />
-                            <h:outputLabel value="#{account.username}">#{"@"}#{account.host}</h:outputLabel>
+                            <h:outputLabel value="#{account.username}"></h:outputLabel>
                         </li>
                     </ui:repeat>
                 </ul>
