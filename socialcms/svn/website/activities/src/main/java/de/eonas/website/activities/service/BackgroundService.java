@@ -36,10 +36,18 @@ public class BackgroundService {
     Logger LOG = Logger.getLogger(BackgroundService.class);
     int oldMessagecount;
 
+
+    int x;
+
+
+
     @Autowired
     Dao dao;
+    List<Integer>updatedMessageNo=new ArrayList<Integer>(4);
 
     public BackgroundService() {
+        x=0;
+        updatedMessageNo.add(x,Integer.valueOf(0));
     }
 
     public Feed addAndCheckFeed ( Feed feed ) throws IOException, FeedException {
@@ -71,6 +79,7 @@ public class BackgroundService {
     public void updateMail(){
         //ReceiveMail m= new ReceiveMail();
        List<Mailer> accounts=dao.getAllAccounts();
+        x=0;
         //m.receiveEmail(accounts);
         for(int i=0;i<accounts.size();i++) {
             Properties props = new Properties();
@@ -79,10 +88,12 @@ public class BackgroundService {
                 //Flags seen = new Flags(Flags.Flag.SEEN);
                 // FlagTerm unseenFlagTerm = new FlagTerm(seen, false);
 
+                updatedMessageNo.add(x,Integer.valueOf(0));
 
                 String account = accounts.get(i).getUsername();
                 String accountpassword = accounts.get(i).getPassword();
                 String host ="imap."+""+accounts.get(i).getHost();
+
                 Session session = Session.getInstance(props, null);
                 Store store = session.getStore();
                 store.connect(host, account, accountpassword);
@@ -90,7 +101,9 @@ public class BackgroundService {
                 Folder inbox = store.getFolder("Inbox");
                 inbox.open(Folder.READ_ONLY);
                 System.out.println(inbox.getMessageCount());
-                int newMessagecount = inbox.getMessageCount();
+                System.out.print(Integer.valueOf(inbox.getMessageCount()));
+                updatedMessageNo.add(x+1,Integer.valueOf(inbox.getMessageCount()));
+                //int newMessagecount = inbox.getMessageCount();
                 //Message msg = inbox.getMessage(inbox.getMessageCount());
                 //message = inbox.getMessages(1,inbox.getMessageCount());
                 //for (int i = 3; i < inbox.getMessageCount(); i++) {
@@ -98,8 +111,8 @@ public class BackgroundService {
                 // message[i].equals(inbox.getMessage(i));
                 //}
                 Message message[] = inbox.getMessages();
-                if (oldMessagecount != newMessagecount) {
-                    for (int j = oldMessagecount; j < newMessagecount; j++) {
+                if (updatedMessageNo.get(x).intValue() != updatedMessageNo.get(x+1).intValue()) {
+                    for (int j = updatedMessageNo.get(x).intValue(); j < updatedMessageNo.get(x+1).intValue(); j++) {
                         Message msg = message[j];
                         System.out.print(j);
                         //Flags flags = msg.getFlags();
@@ -150,7 +163,10 @@ public class BackgroundService {
 
                         }
                     }
-                    oldMessagecount = inbox.getMessageCount();
+                    updatedMessageNo.add(x,Integer.valueOf(inbox.getMessageCount()));
+                    System.out.print(oldMessagecount);
+                    x=x+2;
+                    //System.out.print(newMessagecount);
                 }
 
             } catch (Exception mex) {
