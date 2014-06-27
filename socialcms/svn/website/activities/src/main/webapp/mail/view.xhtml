@@ -18,9 +18,14 @@
                     <p:inputText value="#{mailController.content}"/>
                     <h:commandButton value ="send" actionListener="#{mailController.send}"/>
                 </h:panelGrid>
+                <h:panelGrid><h:outputLink value="#{mailController.compose}">
+                    <span class="label label-danger">Compose Gmail</span></h:outputLink>
+                </h:panelGrid>
+
             </p:panel>
 
             <p:layout style="min-width:400px;min-height:200px;">
+
                <p:layoutUnit position="center">
                     <p:dataTable var="mail" value="#{mailController.allMails}">
                         <p:column headerText="From">
@@ -31,7 +36,12 @@
                             <h:outputText value="#{mail.mailSubject}" />
                         </p:column>
                         <p:column headerText="view">
-                            <p:commandLink  actionListener="#{mailController.getMailFromSubject(mail.messageNumber)}" oncomplete="Message.show()"><span class="glyphicon glyphicon-resize-horizontal"></span></p:commandLink>
+                            <h:outputLink value="#{mail.url}" ><span class="glyphicon glyphicon-envelope"></span></h:outputLink>
+
+                        </p:column>
+                        <p:column headerText="share">
+                            <p:commandButton value="share" action="#{activitiesController.getMail(mail.messageNumber,mail.rectDate)}"></p:commandButton>
+
                         </p:column>
                     </p:dataTable>
                 </p:layoutUnit>

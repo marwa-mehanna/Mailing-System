@@ -259,6 +259,12 @@ public class Dao {
         query.setParameter("ms",ms);
         return query.getSingleResult();
     }
+    public Mail getSMail(int ms,Date date){
+        TypedQuery<Mail> query=em.createQuery("select a from Mail a where a.messageNumber = :ms and a.rectDate =:date",Mail.class);
+        query.setParameter("ms",ms);
+        query.setParameter("date",date);
+        return query.getSingleResult();
+    }
     public Mailer getAccountDetails(String account){
         TypedQuery<Mailer> query=em.createQuery("select a from Mailer a where a.username = :account",Mailer.class);
         query.setParameter("account",account);

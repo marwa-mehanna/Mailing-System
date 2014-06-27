@@ -29,6 +29,10 @@ public class MailController extends AbstractController{
 
 
 
+    String compose;
+
+
+
 
     private String mailSelected;
 
@@ -56,6 +60,7 @@ public class MailController extends AbstractController{
        init();
        allMails = dao.getAllMails();
        updateIMapList();
+       compose ="https://mail.google.com/mail/?view=cm&fs=1&tf=1";
 
    }
     public void addAccount(){
@@ -105,7 +110,9 @@ public class MailController extends AbstractController{
     }
     public void getMailFromSubject(int ms){
         Mail b=dao.getSelectedMail(ms);
+        System.out.print(b.getMailContent());
         mailSelected=b.getMailContent();
+
 
 
     }
@@ -196,6 +203,13 @@ public class MailController extends AbstractController{
 
     public void setAllPersons(List<Person> allPersons) {
         this.allPersons = allPersons;
+    }
+    public String getCompose() {
+        return compose;
+    }
+
+    public void setCompose(String compose) {
+        this.compose = compose;
     }
 
 

@@ -2,6 +2,7 @@ package de.eonas.website.activities.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import java.net.URL;
 import java.util.Date;
 
 @Entity
@@ -17,10 +18,8 @@ public class Mail {
     String MailContent;
     String MailContentType;
     private int messageNumber;
-    boolean Mailread;
     private String host;
-
-
+    URL url;
     private Date rectDate;
 
     public String getMailCC() {
@@ -71,14 +70,6 @@ public class Mail {
         MailContent = mailContent;
     }
 
-    public boolean isMailread() {
-        return Mailread;
-    }
-
-    public void setMailread(boolean mailread) {
-        Mailread = mailread;
-    }
-
     public String getMailContentType() {
         return MailContentType;
     }
@@ -107,6 +98,13 @@ public class Mail {
 
     public void setRectDate(Date rectDate) {
         this.rectDate = rectDate;
+    }
+    public URL getUrl() {
+        return url;
+    }
+
+    public void setUrl(URL url) {
+        this.url = url;
     }
 
 
