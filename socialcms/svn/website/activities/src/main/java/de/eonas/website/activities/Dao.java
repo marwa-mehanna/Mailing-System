@@ -185,6 +185,10 @@ public class Dao {
         TypedQuery<Mail> query = em.createQuery("select a from Mail a where a.host='live.com' order by current_date ", Mail.class);
         return query.getResultList();
     }
+    public List<Mail> getAllYMails() {
+        TypedQuery<Mail> query = em.createQuery("select a from Mail a where a.host='mail.yahoo.com' order by current_date ", Mail.class);
+        return query.getResultList();
+    }
 
     public List<Topic> getAllTopics() {
         TypedQuery<Topic> query = em.createQuery("select a from Topic a order by name", Topic.class);

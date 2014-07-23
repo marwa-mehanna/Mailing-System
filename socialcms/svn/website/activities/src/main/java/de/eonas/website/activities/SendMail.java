@@ -110,7 +110,44 @@ public class SendMail {
             }  finally {
 
             }
+        }else if(host.equals("mail.yahoo.com")){
+        String hostsmtp = "smtp." + host;
+        //String username = username;
+        //final String password = "123456marwa";
+        Properties props = new Properties();
+        // set any needed mail.smtps.* properties here
+        props.put("mail.transport.protocol", "smtp");
+        // props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", hostsmtp);
+        props.put("mail.smtp.user", username);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.debug", "true");
+        props.put("mail.smtp.debug", "true");
+        // props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.starttls.enable","true");
+        Authenticator auth = new GMailAuthenticator();
+        Session session = Session.getInstance(props,auth);
+
+        session.setDebug(true);
+
+        MimeMessage msg = new MimeMessage(session);
+
+        // set the message content here
+        InternetAddress fromAddress = null;
+        InternetAddress toAddress = null;
+        fromAddress = new InternetAddress(from);
+        toAddress = new InternetAddress(to);
+        msg.setFrom(fromAddress);
+        msg.setRecipient(Message.RecipientType.TO, toAddress);
+        msg.setSubject(subject);
+        msg.setText(text);
+        try {
+            Transport.send(msg);
+        }  finally {
+
         }
+    }
 
     }
     private class GMailAuthenticator extends javax.mail.Authenticator {
