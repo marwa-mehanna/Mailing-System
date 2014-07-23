@@ -9,78 +9,90 @@
             <p:panel header="Send your Mail">
                 <h:panelGrid columns="2" columnClasses="column" cellpadding="5">
                     <h:outputText value="From: " />
-                    <p:inputText value="#{mailController.from}"/>
+                    <p:inputText  value=" #{mailController.from}"/>
                     <h:outputText value="to: " />
                     <p:inputText value="#{mailController.to}"/>
                     <h:outputText value="subject: " />
                     <p:inputText value="#{mailController.subject}"/>
                     <h:outputText value="text: " />
-                    <p:inputText value="#{mailController.content}"/>
+                    <p:inputTextarea value="#{mailController.content}"/>
                     <h:commandButton value ="send" actionListener="#{mailController.send}"/>
                 </h:panelGrid>
                 <h:panelGrid><h:outputLink value="#{mailController.compose}">
-                    <span class="label label-danger">Compose Gmail</span></h:outputLink></h:panelGrid>
+                    <span class="label label-danger">Compose Gmail</span></h:outputLink>
+                <h:commandButton value ="refresh" actionListener="#{mailController.updateLists}">
+                    <span class="glyphicon glyphicon-arrow-down"></span>
+                </h:commandButton>
 
+                </h:panelGrid>
             </p:panel>
         </h:form>
-        <h:commandButton  actionListener="#{mailController.updateGmailList}">
-            <span class="glyphicon glyphicon-refresh"></span>
-
-        </h:commandButton>
 
 
 
-        <p:tabView>
+
+        <p:tabView >
             <p:tab title="Gmail">
-            <p:layout style="min-width:400px;min-height:200px;max-height:400px; " >
+                <p:layout style="min-width:400px;min-height:200px;max-height:400px; " >
 
-               <p:layoutUnit position="center" >
-                    <p:dataTable id="l" var="mail" value="#{mailController.allGMails}">
-                        <p:column headerText="From">
-                            <h:outputText value="#{mail.mailFrom}" />
-                        </p:column>
+                    <p:layoutUnit position="center" >
+                        <p:dataTable id="l" var="mail" value="#{mailController.allGMails}">
+                            <p:column headerText="From">
+                                <h:outputText value="#{mail.mailFrom}" />
+                            </p:column>
 
-                        <p:column headerText="Subject">
-                            <h:outputText value="#{mail.mailSubject}" />
-                        </p:column>
-                        <p:column headerText="view">
-                            <h:outputLink value="#{mail.url}" ><span class="glyphicon glyphicon-envelope"></span></h:outputLink>
+                            <p:column headerText="Subject">
+                                <h:outputText value="#{mail.mailSubject}" />
+                            </p:column>
+                            <p:column headerText="view">
+                                <h:outputLink value="#{mail.url}" ><span class="glyphicon glyphicon-envelope"></span></h:outputLink>
 
-                        </p:column>
-                        <p:column headerText="share">
-                            <p:commandButton value="share" action="#{activitiesController.getMail(mail.messageNumber,mail.rectDate)}"></p:commandButton>
+                            </p:column>
+                            <p:column headerText="share">
+                                <p:commandButton value="share" action="#{activitiesController.getMail(mail.messageNumber,mail.rectDate)}"></p:commandButton>
 
-                        </p:column>
-                    </p:dataTable>
-                </p:layoutUnit>
-            </p:layout>
+                                </p:column>
+                             </p:dataTable>
+                    </p:layoutUnit>
+                </p:layout>
             </p:tab>
             <p:tab title="Hotmail">
-            <p:layout style="min-width:400px;min-height:200px;max-height:400px; " >
+                <p:layout style="min-width:400px;min-height:200px;max-height:400px; " >
 
-            <p:layoutUnit position="center" >
-                <p:dataTable  var="mail" value="#{mailController.allHMails}">
-                    <p:column headerText="From" style="max-width: 360px">
-                        <h:outputText value="#{mail.mailFrom}" />
-                    </p:column>
+                    <p:layoutUnit position="center" >
+                        <p:dataTable  var="mail" value="#{mailController.allHMails}">
+                            <p:column headerText="From" style="max-width: 360px">
+                                <h:outputText value="#{mail.mailFrom}" />
+                            </p:column>
 
-                    <p:column headerText="Subject" style="max-width: 160px">
-                        <h:outputText value="#{mail.mailSubject}" />
-                    </p:column>
+                            <p:column headerText="Subject" style="max-width: 160px">
+                                <h:outputText value="#{mail.mailSubject}" />
+                            </p:column>
 
-                </p:dataTable>
-            </p:layoutUnit>
-        </p:layout>`
+                        </p:dataTable>
+                    </p:layoutUnit>
+                </p:layout>`
             </p:tab>
+            <p:tab title="Yahoo">
+                 <p:layout style="min-width:400px;min-height:200px;max-height:400px; " >
+
+                     <p:layoutUnit position="center" >
+                        <p:dataTable  var="mail" value="#{mailController.allYMails}">
+                            <p:column headerText="From" style="max-width: 130px">
+                                <h:outputText value="#{mail.mailFrom}" />
+                            </p:column>
+
+                            <p:column headerText="Subject" style="max-width: 130px">
+                                <h:outputText value="#{mail.mailSubject}" />
+                            </p:column>
+                            <p:column headerText="Content" style="max-width: 200px">
+                                <h:outputText value="#{mail.mailContent}" />
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:layoutUnit>
+                </p:layout>`
+             </p:tab>
         </p:tabView>
-
-
-
-
-
-            <p:dialog header="Mail" id="Message" widgetVar="Message" modal="true">
-                <h:outputText value="#{mailController.mailSelected}" />
-            </p:dialog>
-
     </h:body>
 </f:view>

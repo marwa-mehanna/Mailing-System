@@ -44,6 +44,7 @@ public class BackgroundService {
 
     int x;
     int y;
+    int z;
 
 
 
@@ -51,9 +52,11 @@ public class BackgroundService {
     Dao dao;
     List<Integer>updatedMessageNo=new ArrayList<Integer>(4);
     List<Integer>updatedMessageNohotmail=new ArrayList<Integer>(4);
+    List<Integer>updatedMessageZ=new ArrayList<Integer>(4);
 
     public BackgroundService() {
         x=0;
+        updatedMessageZ.add(z,Integer.valueOf(0));
         updatedMessageNo.add(x,Integer.valueOf(0));
     }
 
@@ -105,7 +108,7 @@ public class BackgroundService {
 
 
                 Session session = Session.getInstance(props, null);
-                 store =(GmailSSLStore) session.getStore();
+                store =(GmailSSLStore) session.getStore();
                 store.connect(account, accountpassword);
                 System.out.println("Established Connection to Server! gmail");
                 folder = (GmailFolder)store.getFolder("Inbox");
@@ -117,72 +120,57 @@ public class BackgroundService {
                 fp.add(GmailFolder.FetchProfileItem.LABELS);
 
                 folder.fetch(ms, fp);
-                //System.out.println(folder.getMessageCount());
-                //System.out.print(Integer.valueOf(folder.getMessageCount()));
                 updatedMessageNo.add(x+1,Integer.valueOf(folder.getMessageCount()));
                 Message message[] = folder.getMessages();
-                //if (updatedMessageNo.get(y).intValue() != updatedMessageNo.get(y+1).intValue()) {
-                    //for (int n = updatedMessageNo.get(y).intValue(); n < updatedMessageNo.get(y+1).intValue(); n++) {
-                        //Message msg = message[n];
-                        //System.out.print(j);
-                        //boolean f = dao.checkMailUnExistence(msg.getMessageNumber(),msg.getReceivedDate(),accounts.get(i).getHost());
+                GmailMessage gm;
+                System.out.println("Found specified Folder, retrieving the latest message...");
+                Mail mail = new Mail();
+                for (Message m : ms) {
+                    gm = (GmailMessage) m;
+                    //System.out.println(gm.getMsgId());
+                    // Hex version - useful for linking to Gmail
+                    System.out.println(Long.toHexString(gm.getMsgId()));
+                    String id= Long.toHexString(gm.getMsgId())+"";
+                    String x ="https://mail.google.com/mail/#inbox/"+id;
+                    URL url=new URL(x);
+                    boolean f = dao.checkMailUnExistenceByUrl(url);
+                    System.out.print(f);
+                    if (f) {
+                    //System.out.println(url);
+                    Object content = gm.getContent();
+                    if (content instanceof String) {
+                        String body = (String) content;
+                        mail.setMailContent(body);
+                        mail.setMailSubject(gm.getSubject());
+                        mail.setMailFrom(gm.getFrom().toString());
+                        mail.setMessageNumber(gm.getMessageNumber());
+                        mail.setHost(accounts.get(i).getHost());
+                        mail.setRectDate(gm.getReceivedDate());
+                        mail.setUrl(url);
+                        mail.setMailFrom(gm.getSender().toString());
+                        dao.saveMail(mail);
+                        //return mail;
 
+                    } else if (content instanceof Multipart) {
+                        Multipart mp = (Multipart) content;
+                        BodyPart bp = mp.getBodyPart(0);
+                        mail.setMailContent(bp.getContent().toString());
+                        mail.setMailContentType(bp.getContentType().toString());
+                        mail.setMailSubject(gm.getSubject());
+                        mail.setMessageNumber(gm.getMessageNumber());
+                        mail.setHost(accounts.get(i).getHost());
+                        mail.setRectDate(gm.getReceivedDate());
+                        mail.setUrl(url);
+                        mail.setMailFrom(gm.getSender().toString());
 
-                        GmailMessage gm;
+                        System.out.println("CONTENT:" + bp.getContent());
+                        //return mail;
+                        dao.saveMail(mail);
+                    }
+                }
 
-                            System.out.println("Found specified Folder, retrieving the latest message...");
-                            Mail mail = new Mail();
-                            for (Message m : ms) {
-                                gm = (GmailMessage) m;
-                                //System.out.println(gm.getMsgId());
-                                // Hex version - useful for linking to Gmail
-                                System.out.println(Long.toHexString(gm.getMsgId()));
-                                String id= Long.toHexString(gm.getMsgId())+"";
-                                String x ="https://mail.google.com/mail/#inbox/"+id;
-                                URL url=new URL(x);
-                                boolean f = dao.checkMailUnExistenceByUrl(url);
-                                System.out.print(f);
-                                if (f) {
-                                //System.out.println(url);
-                                Object content = gm.getContent();
-                                if (content instanceof String) {
-                                    String body = (String) content;
-                                    mail.setMailContent(body);
-                                    mail.setMailSubject(gm.getSubject());
-                                    mail.setMailFrom(gm.getFrom().toString());
-                                    mail.setMessageNumber(gm.getMessageNumber());
-                                    mail.setHost(accounts.get(i).getHost());
-                                    mail.setRectDate(gm.getReceivedDate());
-                                    mail.setUrl(url);
-                                    mail.setMailFrom(gm.getSender().toString());
-                                    dao.saveMail(mail);
-                                    //return mail;
+            }
 
-                                } else if (content instanceof Multipart) {
-                                    Multipart mp = (Multipart) content;
-                                    BodyPart bp = mp.getBodyPart(0);
-                                    mail.setMailContent(bp.getContent().toString());
-                                    mail.setMailContentType(bp.getContentType().toString());
-                                    mail.setMailSubject(gm.getSubject());
-                                    mail.setMessageNumber(gm.getMessageNumber());
-                                    mail.setHost(accounts.get(i).getHost());
-                                    mail.setRectDate(gm.getReceivedDate());
-                                    mail.setUrl(url);
-                                    mail.setMailFrom(gm.getSender().toString());
-
-                                    System.out.println("CONTENT:" + bp.getContent());
-                                    //return mail;
-                                    dao.saveMail(mail);
-                                }
-                            }
-
-                        }
-                    //}
-                   // updatedMessageNo.add(y,Integer.valueOf(folder.getMessageCount()));
-                    //System.out.print(oldMessagecount);
-                    //y=y+2;
-                    //System.out.print(newMessagecount);
-                //}
 
             } catch (Exception mex) {
                 mex.printStackTrace();
@@ -198,36 +186,125 @@ public void updateMail() {
     for (int i = 0; i < accounts.size(); i++) {
 
         if (accounts.get(i).getHost().equals("live.com")) {
-            //Properties props = new Properties();
-            //props.setProperty("mail.store.protocol", "imaps");
             Properties pop3Props = new Properties();
             pop3Props.setProperty("mail.pop3s.port",  "995");
 
-             try{
-                updatedMessageNohotmail.add(x, Integer.valueOf(0));
+                try{
+                    updatedMessageNohotmail.add(x, Integer.valueOf(0));
+
+                    String account = accounts.get(i).getUsername();
+                    String accountpassword = accounts.get(i).getPassword();
+                    String host = "pop3.live.com";
+                    Session session = Session.getInstance(pop3Props, null);
+                    Store store = session.getStore("pop3s");
+                    store.connect(host, 995, account, accountpassword);
+
+                    System.out.println("Established Connection to Server!");
+                    Folder inbox = store.getFolder("Inbox");
+                    inbox.open(Folder.READ_ONLY);
+                    System.out.println(inbox.getMessageCount());
+                    System.out.print(Integer.valueOf(inbox.getMessageCount()));
+                    updatedMessageNohotmail.add(x + 1, Integer.valueOf(inbox.getMessageCount()));
+                    Message message[] = inbox.getMessages();
+                    if (updatedMessageNohotmail.get(x).intValue() != updatedMessageNohotmail.get(x + 1).intValue()) {
+                        for (int j = updatedMessageNohotmail.get(x).intValue(); j < updatedMessageNohotmail.get(x + 1).intValue(); j++) {
+                            Message msg = message[j];
+                            boolean f = dao.checkMailUnExistence(msg.getMessageNumber(), msg.getReceivedDate(), accounts.get(i).getHost());
+                            System.out.print(f);
+                            if (f)
+                            {
+                                    System.out.println("Found specified Folder, retrieving the latest message...");
+
+
+                                    Mail mail = new Mail();
+                                    Address[] in = msg.getFrom();
+
+                                    for (Address address : in) {
+                                    mail.setMailFrom(address.toString());
+                                    }
+                                    Object content = msg.getContent();
+                                    if (content instanceof String) {
+                                        String body = (String) content;
+                                        mail.setMailSubject(msg.getSubject());
+                                        mail.setMailFrom(msg.getFrom().toString());
+                                        mail.setMessageNumber(msg.getMessageNumber());
+                                        mail.setHost(accounts.get(i).getHost());
+                                        mail.setRectDate(msg.getReceivedDate());
+                                        dao.saveMail(mail);
+                                    } else if (content instanceof Multipart) {
+                                        Multipart mp = (Multipart) content;
+                                        int count3 = mp.getCount();
+                                        for (int l = 0; l < count3; l++) {
+                                            BodyPart bp = mp.getBodyPart(l);
+                                            Object o2 = bp.getContent();
+                                            if (o2 instanceof String) {
+                                                String body = (String) o2;
+                                                //mail.setMailContent(body);
+                                                mail.setMailSubject(msg.getSubject());
+                                                mail.setMailFrom(msg.getFrom().toString());
+                                                mail.setMessageNumber(msg.getMessageNumber());
+                                                mail.setHost(accounts.get(i).getHost());
+                                                mail.setRectDate(msg.getReceivedDate());
+                                                dao.saveMail(mail);
+                                            }
+                                            else if (o2 instanceof Multipart) {
+                                                System.out.print(
+                                                    "**This BodyPart is a nested Multipart.  ");
+                                                Multipart mp2 = (Multipart)o2;
+                                                int count2 = mp2.getCount();
+                                                mp=mp2;
+                                                count3=count2;
+                                            }
+                                        }
+
+                                    }
+                                }
+                        }
+                        updatedMessageNohotmail.add(x, Integer.valueOf(inbox.getMessageCount()));
+                        System.out.print(oldMessagecount);
+                        x = x + 2;
+
+                    }
+            } catch (Exception mex) {
+                mex.printStackTrace();
+            }
+        }else if(accounts.get(i).getHost().equals("mail.yahoo.com")){
+            Properties props = new Properties();
+            props.setProperty("mail.store.protocol", "imaps");
+            try {
+                //Flags seen = new Flags(Flags.Flag.SEEN);
+                // FlagTerm unseenFlagTerm = new FlagTerm(seen, false);
+
+                updatedMessageNo.add(z,Integer.valueOf(0));
 
                 String account = accounts.get(i).getUsername();
                 String accountpassword = accounts.get(i).getPassword();
-                String host = "pop3.live.com";
+                String host ="imap."+""+accounts.get(i).getHost();
 
-                //Session session = Session.getInstance(props, null);
-                //Store store = session.getStore();
-                //store.connect(host, account, accountpassword);
-                 Session session = Session.getInstance(pop3Props, null);
-                 Store store = session.getStore("pop3s");
-                 store.connect(host, 995, account, accountpassword);
-
+                Session session = Session.getInstance(props, null);
+                Store store = session.getStore();
+                store.connect(host, account, accountpassword);
                 System.out.println("Established Connection to Server!");
                 Folder inbox = store.getFolder("Inbox");
                 inbox.open(Folder.READ_ONLY);
                 System.out.println(inbox.getMessageCount());
                 System.out.print(Integer.valueOf(inbox.getMessageCount()));
-                updatedMessageNohotmail.add(x + 1, Integer.valueOf(inbox.getMessageCount()));
+                updatedMessageZ.add(z+1,Integer.valueOf(inbox.getMessageCount()));
+                //int newMessagecount = inbox.getMessageCount();
+                //Message msg = inbox.getMessage(inbox.getMessageCount());
+                //message = inbox.getMessages(1,inbox.getMessageCount());
+                //for (int i = 3; i < inbox.getMessageCount(); i++) {
+
+                // message[i].equals(inbox.getMessage(i));
+                //}
                 Message message[] = inbox.getMessages();
-                if (updatedMessageNohotmail.get(x).intValue() != updatedMessageNohotmail.get(x + 1).intValue()) {
-                    for (int j = updatedMessageNohotmail.get(x).intValue(); j < updatedMessageNohotmail.get(x + 1).intValue(); j++) {
+                if (updatedMessageZ.get(z).intValue() != updatedMessageZ.get(z+1).intValue()) {
+                    for (int j = updatedMessageZ.get(z).intValue(); j < updatedMessageZ.get(z+1).intValue(); j++) {
                         Message msg = message[j];
-                        boolean f = dao.checkMailUnExistence(msg.getMessageNumber(), msg.getReceivedDate(), accounts.get(i).getHost());
+                        System.out.print(j);
+                        //Flags flags = msg.getFlags();
+
+                        boolean f = dao.checkMailUnExistence(msg.getMessageNumber(),msg.getReceivedDate(),accounts.get(i).getHost());
                         System.out.print(f);
                         if (f) {
                             System.out.println("Found specified Folder, retrieving the latest message...");
@@ -238,12 +315,13 @@ public void updateMail() {
 
                             for (Address address : in) {
 
+                                //System.out.println("FROM:" + address.toString());
                                 mail.setMailFrom(address.toString());
                             }
                             Object content = msg.getContent();
                             if (content instanceof String) {
                                 String body = (String) content;
-                                //mail.setMailContent(body);
+                                mail.setMailContent(body);
                                 mail.setMailSubject(msg.getSubject());
                                 mail.setMailFrom(msg.getFrom().toString());
                                 mail.setMessageNumber(msg.getMessageNumber());
@@ -256,47 +334,34 @@ public void updateMail() {
 
                             } else if (content instanceof Multipart) {
                                 Multipart mp = (Multipart) content;
-                                int count3 = mp.getCount();
-                                for (int l = 0; l < count3; l++) {
-                                    BodyPart bp = mp.getBodyPart(l);
-                                    //String mimeType2 = bp.getContentType();
-                                    Object o2 = bp.getContent();
-                                    if (o2 instanceof String) {
-                                        //System.out.println("**This is a String BodyPart**");
-                                        //System.out.println((String)o2);
-                                        String body = (String) o2;
-                                        //mail.setMailContent(body);
-                                        mail.setMailSubject(msg.getSubject());
-                                        mail.setMailFrom(msg.getFrom().toString());
-                                        mail.setMessageNumber(msg.getMessageNumber());
-                                        mail.setHost(accounts.get(i).getHost());
-                                        mail.setRectDate(msg.getReceivedDate());
-                                        dao.saveMail(mail);
-                                    }
-                                    else if (o2 instanceof Multipart) {
-                                        System.out.print(
-                                                "**This BodyPart is a nested Multipart.  ");
-                                        Multipart mp2 = (Multipart)o2;
-                                        int count2 = mp2.getCount();
-                                        mp=mp2;
-                                        count3=count2;
-                                    }
-                                }
+                                BodyPart bp = mp.getBodyPart(0);
+                                mail.setMailContent(bp.getContent().toString());
+                                mail.setMailContentType(bp.getContentType().toString());
+                                mail.setMailSubject(msg.getSubject());
+                                mail.setMessageNumber(msg.getMessageNumber());
+                                mail.setHost(accounts.get(i).getHost());
+                                mail.setRectDate(msg.getReceivedDate());
 
+                                System.out.println("CONTENT:" + bp.getContent());
+                                //return mail;
+                                dao.saveMail(mail);
                             }
 
 
                         }
                     }
-                    updatedMessageNohotmail.add(x, Integer.valueOf(inbox.getMessageCount()));
+                    updatedMessageZ.add(z,Integer.valueOf(inbox.getMessageCount()));
                     System.out.print(oldMessagecount);
-                    x = x + 2;
-
+                    z=z+2;
+                    //System.out.print(newMessagecount);
                 }
 
             } catch (Exception mex) {
                 mex.printStackTrace();
-            }}
+            }
+
+        }
+
     }
 }
         @Scheduled(fixedDelay = 120000)
