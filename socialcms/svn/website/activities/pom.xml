@@ -151,6 +151,13 @@
             <artifactId>gimap</artifactId>
             <version>1.4.7</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>pop3</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
         <dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-compat-tomcat</artifactId>
