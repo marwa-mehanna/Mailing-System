@@ -4,6 +4,7 @@ import de.eonas.website.activities.model.*;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.net.URL;
 import java.util.*;
 
 @Component
@@ -121,6 +122,21 @@ public class Dao {
             }
 
     }
+    public boolean checkMailUnExistenceByUrl(URL url){
+        TypedQuery<Mail> query = em.createQuery("select a from Mail a where a.url= :url", Mail.class);
+        query.setParameter("url", url);
+
+
+
+        if( query.getResultList().size()==0){
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
 
     public void saveFeedEntry(FeedEntry feedEntry) {
         em.merge(feedEntry);
@@ -161,8 +177,12 @@ public class Dao {
         return query.getResultList();
     }
 
-    public List<Mail> getAllMails() {
-        TypedQuery<Mail> query = em.createQuery("select a from Mail a order by current_date ", Mail.class);
+    public List<Mail> getAllGMails() {
+        TypedQuery<Mail> query = em.createQuery("select a from Mail a where a.host='gmail.com' order by current_date ", Mail.class);
+        return query.getResultList();
+    }
+    public List<Mail> getAllHMails() {
+        TypedQuery<Mail> query = em.createQuery("select a from Mail a where a.host='live.com' order by current_date ", Mail.class);
         return query.getResultList();
     }
 
