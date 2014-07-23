@@ -4,6 +4,7 @@ import de.eonas.website.activities.model.Mail;
 import de.eonas.website.activities.model.Mailer;
 import de.eonas.website.activities.model.Person;
 import de.eonas.website.activities.model.Poi;
+import de.eonas.website.activities.service.BackgroundService;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -21,27 +22,17 @@ public class MailController extends AbstractController{
     private String username;
     private String password;
     private String host;
-
     private String from;
     private String to;
     private String subject;
     private String content;
-
-
-
     String compose;
-
-
-
-
     private String mailSelected;
+    BackgroundService s;
 
 
-
-    private List<Mail> allMails;
-
-
-
+    private List<Mail> allGMails;
+    private List<Mail> allHMails;
     private List<Person>allPersons;
 
 
@@ -58,14 +49,16 @@ public class MailController extends AbstractController{
 
    public MailController() throws IOException{
        init();
-       allMails = dao.getAllMails();
+
+       allHMails= dao.getAllHMails();
+       allGMails= dao.getAllGMails();
        updateIMapList();
+
        compose ="https://mail.google.com/mail/?view=cm&fs=1&tf=1";
 
    }
     public void addAccount(){
         Poi poi = getPoi();
-
         Mailer account=new Mailer();
         account.setUsername(username);
         account.setPassword(password);
@@ -77,8 +70,11 @@ public class MailController extends AbstractController{
         username="";
         password="";
         host="";
-
     }
+    public void updateGmailList(){
+        allGMails=dao.getAllGMails();
+    }
+
     private void updateIMapList() {
 
         Poi poi = getPoi();
@@ -183,13 +179,7 @@ public class MailController extends AbstractController{
     public void setContent(String content) {
         this.content = content;
     }
-    public List<Mail> getAllMails() {
-        return allMails;
-    }
 
-    public void setAllMails(List<Mail> allMails) {
-        this.allMails = allMails;
-    }
     public String getMailSelected() {
         return mailSelected;
     }
@@ -212,6 +202,20 @@ public class MailController extends AbstractController{
         this.compose = compose;
     }
 
+    public List<Mail> getAllGMails() {
+        return allGMails;
+    }
 
+    public void setAllGMails(List<Mail> allGMails) {
+        this.allGMails = allGMails;
+    }
+
+    public List<Mail> getAllHMails() {
+        return allHMails;
+    }
+
+    public void setAllHMails(List<Mail> allHMails) {
+        this.allHMails = allHMails;
+    }
 
 }
