@@ -29,50 +29,89 @@ public class SendMail {
 
 
     public void send() throws MessagingException {
-      String hostsmtp="smtp."+host;
-         //String username = username;
-        //final String password = "123456marwa";
-        Properties props = new Properties();
-        // set any needed mail.smtps.* properties here
-        props.put("mail.transport.protocol", "smtp");
-       // props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", hostsmtp);
-        props.put("mail.smtp.user", username);
-        props.put("mail.smtp.auth","true");
-        props.put("mail.smtp.port", "465");
-        props.put("mail.debug", "true");
-        props.put("mail.smtp.debug", "true");
-        props.put("mail.smtp.ssl.enable","true");
-       // props.put("mail.smtp.starttls.enable","true");
+        if(host.equals("gmail.com")) {
+            String hostsmtp = "smtp." + host;
+            //String username = username;
+            //final String password = "123456marwa";
+            Properties props = new Properties();
+            // set any needed mail.smtps.* properties here
+            props.put("mail.transport.protocol", "smtp");
+            // props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", hostsmtp);
+            props.put("mail.smtp.user", username);
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.port", "465");
+            props.put("mail.debug", "true");
+            props.put("mail.smtp.debug", "true");
+            props.put("mail.smtp.ssl.enable", "true");
+            // props.put("mail.smtp.starttls.enable","true");
 
 
-        //props.put("mail.mime.charset", "ISO-8859-1");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.fallback", "false");
-        props.put("mail.smtp.socketFactory.class",
-                "javax.net.ssl.SSLSocketFactory");
+            //props.put("mail.mime.charset", "ISO-8859-1");
+             props.put("mail.smtp.socketFactory.port", "465");
+            props.put("mail.smtp.socketFactory.fallback", "false");
+            props.put("mail.smtp.socketFactory.class",
+                 "javax.net.ssl.SSLSocketFactory");
+            Authenticator auth = new GMailAuthenticator();
+            Session session = Session.getInstance(props,auth);
 
-        Authenticator auth = new GMailAuthenticator();
-        Session session = Session.getInstance(props,auth);
+            session.setDebug(true);
 
-        session.setDebug(true);
+            MimeMessage msg = new MimeMessage(session);
 
-        MimeMessage msg = new MimeMessage(session);
+            // set the message content here
+            InternetAddress fromAddress = null;
+            InternetAddress toAddress = null;
+            fromAddress = new InternetAddress(from);
+            toAddress = new InternetAddress(to);
+            msg.setFrom(fromAddress);
+            msg.setRecipient(Message.RecipientType.TO, toAddress);
+            msg.setSubject(subject);
+            msg.setText(text);
+            try {
+                Transport.send(msg);
+            }  finally {
 
-        // set the message content here
-        InternetAddress fromAddress = null;
-        InternetAddress toAddress = null;
-        fromAddress = new InternetAddress(from);
-        toAddress = new InternetAddress(to);
-        msg.setFrom(fromAddress);
-        msg.setRecipient(Message.RecipientType.TO, toAddress);
-        msg.setSubject(subject);
-        msg.setText(text);
-        try {
-            Transport.send(msg);
-        }  finally {
+            }
+        }  else if(host.equals("live.com")){
+            String hostsmtp = "smtp." + host;
+            //String username = username;
+            //final String password = "123456marwa";
+            Properties props = new Properties();
+            // set any needed mail.smtps.* properties here
+            props.put("mail.transport.protocol", "smtp");
+            // props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", hostsmtp);
+            props.put("mail.smtp.user", username);
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.port", "25");
+            props.put("mail.debug", "true");
+            props.put("mail.smtp.debug", "true");
+           // props.put("mail.smtp.ssl.enable", "true");
+             props.put("mail.smtp.starttls.enable","true");
+            Authenticator auth = new GMailAuthenticator();
+            Session session = Session.getInstance(props,auth);
 
+            session.setDebug(true);
+
+            MimeMessage msg = new MimeMessage(session);
+
+            // set the message content here
+            InternetAddress fromAddress = null;
+            InternetAddress toAddress = null;
+            fromAddress = new InternetAddress(from);
+            toAddress = new InternetAddress(to);
+            msg.setFrom(fromAddress);
+            msg.setRecipient(Message.RecipientType.TO, toAddress);
+            msg.setSubject(subject);
+            msg.setText(text);
+            try {
+                Transport.send(msg);
+            }  finally {
+
+            }
         }
+
     }
     private class GMailAuthenticator extends javax.mail.Authenticator {
         public PasswordAuthentication getPasswordAuthentication() {
